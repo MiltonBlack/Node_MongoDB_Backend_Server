@@ -15,6 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/data', require('./routes/dataRoutes'));
+app.use('/auth/signup', require('./routes/authRoutes'))
 app.use(errorHandler);
 app.listen(port, () => console.log(`Server started running on port ${port}...`));
 
