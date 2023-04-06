@@ -14,14 +14,16 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// app.use('/', (req, res)=> res.send('hello world'));
+
 app.use('/api/data', require('./routes/dataRoutes'));
-app.use('/auth/signup', require('./routes/authRoutes'))
+app.use('/auth', require('./routes/authRoutes'))
 app.use(errorHandler);
 app.listen(port, () => console.log(`Server started running on port ${port}...`));
 
 
 
-// app.get('/api/data', (req, res) => {
-//     // res.send('get Data')
-//     res.status(200).json({ message: "get Data" })
+// app.get('/', (req, res) => {
+//     res.send('get Data')
+//     res.status(200).json({ message: "ping pong" })
 // })

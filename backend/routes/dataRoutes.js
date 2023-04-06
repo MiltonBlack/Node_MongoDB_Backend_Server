@@ -7,15 +7,11 @@ router.route('/').get(getData).post(setData);
 router.route('/:id').delete(deleteData).put(updateData);
 
 // router.get('/', getData) 
-
 // router.post('/', setData)
-
 // router.put('/:id', updateData)
-
 // router.delete('/:id', deleteData)
 
 module.exports = router;
-
 
 
 // router.get('/api/data', (req, res) => {
