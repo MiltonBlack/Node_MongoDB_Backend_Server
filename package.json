@@ -2,10 +2,10 @@
   "name": "rest_api",
   "version": "1.0.0",
   "description": "Rest API for React Front-End using Node_JS, Express, Mongoose, MongoDB, nodemon and dotenv",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "server": "nodemon backend/server.js"
+    "start": "node index.js",
+    "server": "nodemon index.js"
   },
   "keywords": [],
   "author": "Milton Black",
@@ -13,6 +13,7 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "colors": "^1.4.0",
+    "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
