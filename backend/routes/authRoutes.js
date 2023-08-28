@@ -4,18 +4,19 @@ const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 
 var single = [];
-router.post("/signin",  (req, res) => {
+router.post("/signin", async (req, res) => {
     console.log(req.body);
-    const user =  User.findOne( { email: req.body.email, });
+    const user = await User.findOne({ email: req.body.email });
     try {
         if(!user) {
          res.status(401).json("User Email Not Found!!");
-        } else {            
-            const bytes =  CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
-            const realPassword =  bytes.toString(CryptoJS.enc.Utf8);
+        } else {    
+            console.log(user);        
+            const bytes = await CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
+            const realPassword = await  bytes.toString(CryptoJS.enc.Utf8);
             
             realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
-            const accessToken = jwt.sign({
+            const accessToken = await jwt.sign({
                 id: user._id, email: user.email
         },
             process.env.SECRET_KEY, { expiresIn: "5d" }
