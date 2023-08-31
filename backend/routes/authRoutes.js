@@ -2,6 +2,7 @@ const router = require("express").Router();
 const User = require("../models/auth");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
+const verify = require("../verifyToken");
 
 var single = [];
 router.post("/signin", async (req, res) => {
@@ -68,16 +69,22 @@ router.delete('/:id', (req, res) => {
     res.status(200).json({ message: `Delete Data ${req.params.id}` })
 })
 
-router.post('/find', async(req, res) => {
-    let evy = await User.findOne({ email: req.body.email}).exec();
-    console.log(evy);
-    console.log(req.body);
-    console.log(req.query);
-    if(evy){
-        res.status(200).json(evy)
-    } else{
-        res.status(400).json("nir found")
+router.put("/plan/:id", verify, async (req, res) => {
+    console.log(req.body)
+    console.log(req.params);
+    console.log(req.user);
+    if (req.user.id === req.params.id) {
+        try {
+            const updateUser = await User.findByIdAndUpdate(req.params.id, { $set: req.body, }
+                , {new: true});
+            res.status(200).json(updateUser);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json(err);
+        }
+    } else {
+        res.status(403).json("You can Only Update Your Account")
     }
-})
+});
 // Login
 module.exports = router;
