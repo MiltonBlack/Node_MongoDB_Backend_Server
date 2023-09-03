@@ -3,6 +3,7 @@ const User = require("../models/auth");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const verify = require("../verifyToken");
+const Deposits = require("../models/deposits");
 
 var single = [];
 router.post("/signin", async (req, res) => {
@@ -108,14 +109,14 @@ router.put("/settings/security/:id", verify, async (req, res) => {
                 req.body.password,
                 process.env.SECRET_KEY
             ).toString();
-            
+
             data = {
                 password: req.body.password
             };
         }
         console.log(data);
         try {
-            const updatePassword = await User.findByIdAndUpdate(req.params.id, { $set: data, }
+            const updatePassword = await User.findByIdAndUpdate(req.params.id, { $set: { password: req.body.password }, }
                 , { new: true });
             res.status(200).json(updatePassword.password);
         } catch (err) {
@@ -140,5 +141,19 @@ router.put("/settings/account/:id", verify, async (req, res) => {
         res.status(403).json("You can Only Update Your Account")
     }
 });
+// Deposit
+router.post("/deposit", verify, async (req, res)=> {
+    try {
+        const deposit = new Deposits(req.body);
+        await deposit.save();
+        const all = await User.findById({_id: deposit.deposits})
+        all.deposits.push(deposit);
+        await all.save();
+        res.status(200).json(all);
+    } catch (error) {
+        res.status(403).json(error)
+    }
+})
+
 // Login
 module.exports = router;
