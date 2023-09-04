@@ -22,10 +22,6 @@ const userSchema = new mongoose.Schema({
     phoneNumber: {
         type: String,
     },
-    plan: {
-        type: String,
-        default: "none"
-    },
     startDate: {
         type: String,
         default: ""
@@ -42,14 +38,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: "fw47g82rgb482hrbrfui4834h984r398hfnfwo"
     },
-    approved: {
-        type: Boolean,
-        default: false
-    },
-    status: {
-        type: String,
-        default: "pending"
-    },
     investment: {
         type: String,
         default: "pending"
@@ -62,10 +50,6 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    deposits: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Deposits'
-    }],
     subscriptions: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Subscriptions'

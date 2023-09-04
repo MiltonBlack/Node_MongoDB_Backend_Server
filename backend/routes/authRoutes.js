@@ -4,6 +4,7 @@ const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const verify = require("../verifyToken");
 const Deposits = require("../models/deposits");
+const Withdrawals = require("../models/withdrawals");
 
 var single = [];
 router.post("/signin", async (req, res) => {
@@ -141,15 +142,26 @@ router.put("/settings/account/:id", verify, async (req, res) => {
         res.status(403).json("You can Only Update Your Account")
     }
 });
+
 // Deposit
 router.post("/deposit", verify, async (req, res)=> {
     try {
-        const deposit = new Deposits(req.body);
+        console.log(req.body)
+        const deposit = await new Deposits(req.body);
         await deposit.save();
-        const all = await User.findById({_id: deposit.deposits})
-        all.deposits.push(deposit);
-        await all.save();
-        res.status(200).json(all);
+        res.status(201).json(deposit);
+    } catch (error) {
+        res.status(403).json(error)
+    }
+})
+
+// Withdraw
+router.post("/withdraw", verify, async (req, res)=> {
+    try {
+        console.log(req.body)
+        const withdraw = await new Withdrawals(req.body);
+        await withdraw.save();
+        res.status(201).json(withdraw);
     } catch (error) {
         res.status(403).json(error)
     }
