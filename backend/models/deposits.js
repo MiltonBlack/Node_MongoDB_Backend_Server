@@ -7,11 +7,6 @@ const depositSchema = new Schema({
     status: { type: String, default: "pending" },
     proofUrl: { type: String, },
     pending: { type: Boolean, },
-    // user: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'User',
-    //     required: true
-    // }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Deposits', depositSchema);

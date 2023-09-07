@@ -8,7 +8,6 @@ const Withdrawals = require("../models/withdrawals");
 
 var single = [];
 router.post("/signin", async (req, res) => {
-    console.log(req.body);
     const user = await User.findOne({ email: req.body.email });
     try {
         if (!user) {
@@ -30,9 +29,9 @@ router.post("/signin", async (req, res) => {
     } catch (err) {
         res.status(500).json(err)
     }
-})
+});
 
-//Register
+// Register
 router.post("/register", async (req, res) => {
     const newUser = await new User({
         firstName: req.body.firstName,
@@ -46,19 +45,23 @@ router.post("/register", async (req, res) => {
     } catch (err) {
         res.status(500).json(err);
     }
-})
+});
 
 
-router.get("/all", async (req, res) => {
-    const all = await User.find();
-    single = [all];
+// Get Single user on Page Load
+router.get("/single/:id", verify, async (req, res) => {
     try {
-        console.log(single);
-        res.status(200).json(all)
+        console.log(req.params);
+        if (req.params) {
+            const single = await User.findById(req.params.id);
+            res.status(200).json(single);
+        } else {
+            res.status(403).json("Bad Request!!");
+        }
     } catch (error) {
         res.status(500).json(error);
     }
-});
+})
 
 router.put('deposit/:id', (req, res) => {
     res.status(200).json({ message: `Update Data ${req.params.id}` })
@@ -67,9 +70,6 @@ router.put('all/:id', (req, res) => {
     res.status(200).json({ message: `Update Data ${req.params.id}` })
 })
 
-router.delete('/:id', (req, res) => {
-    res.status(200).json({ message: `Delete Data ${req.params.id}` })
-})
 
 // Update User Plan
 router.put("/plan/:id", verify, async (req, res) => {
@@ -144,7 +144,7 @@ router.put("/settings/account/:id", verify, async (req, res) => {
 });
 
 // Deposit
-router.post("/deposit", verify, async (req, res)=> {
+router.post("/deposit", verify, async (req, res) => {
     try {
         console.log(req.body)
         const deposit = await new Deposits(req.body);
@@ -155,8 +155,24 @@ router.post("/deposit", verify, async (req, res)=> {
     }
 })
 
-// Withdraw
-router.post("/withdraw", verify, async (req, res)=> {
+
+// Fetch all Deposits by user_id
+router.get("/deposit/single/:id", verify, async (req, res) => {
+    try {
+        if (req.params.id) {
+            console.log(req.params.id);
+            const singleDeposit = await Deposits.find({ user_id : req.params.id });
+            res.status(200).json(singleDeposit);
+        } else {
+            res.status(403).json("Bad Request!!");
+        }
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
+
+// Withdraw Request
+router.post("/withdraw", verify, async (req, res) => {
     try {
         console.log(req.body)
         const withdraw = await new Withdrawals(req.body);
@@ -165,7 +181,16 @@ router.post("/withdraw", verify, async (req, res)=> {
     } catch (error) {
         res.status(403).json(error)
     }
-})
+});
 
-// Login
+// Fetch Withdrawals by user_id
+router.get("/withdraw/single/:id", verify, async (req, res) => {
+    try {
+        const singleWithdraw = await Withdrawals.find({ user_id: req.params.id });
+        res.status(201).json(singleWithdraw);
+    } catch (error) {
+        res.status(403).json(error)
+    }
+});
+
 module.exports = router;
