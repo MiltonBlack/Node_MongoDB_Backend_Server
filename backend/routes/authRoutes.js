@@ -33,6 +33,9 @@ router.post("/signin", async (req, res) => {
 
 // Register
 router.post("/register", async (req, res) => {
+    if(req.body.isAdmin){
+        
+    }
     const newUser = await new User({
         firstName: req.body.firstName,
         lastName: req.body.lastName,

@@ -4,13 +4,14 @@ const Admin = require('../models/admin')
 const Deposits = require('../models/deposits')
 const User = require('../models/auth')
 const verify = require('../verifyToken')
+const CryptoJS = require('crypto-js')
+const jwt = require("jsonwebtoken");
 
 //Register Admin
 router.post("/register", async (req, res) => {
     const newUser = await new Admin({
         email: req.body.email,
         fullName: req.body.fullName,
-        // isAdmin:req.body.isAdmin,
         password: CryptoJS.AES.encrypt(req.body.password, process.env.SECRET_KEY).toString(),
     });
     try {
@@ -23,23 +24,22 @@ router.post("/register", async (req, res) => {
 
 // Signin Admin
 router.post("/signin", async (req, res) => {
-    const user = await Admin.findOne({ email: req.body.email, isAdmin: req.body.isAdmin });
+    const user = await Admin.findOne({ email: req.body.email, isAdmin: true });
     try {
         if (!user) {
             res.status(401).json("User Email Not Found!!");
         } else {
-            console.log(user);
             const bytes = await CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
             const realPassword = await bytes.toString(CryptoJS.enc.Utf8);
 
             realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
             const accessToken = await jwt.sign({
-                id: user._id, isAdmin: user.isAdmin
+                fullName: user.fullName, email: user.email
             },
                 process.env.SECRET_KEY, { expiresIn: "5d" }
             );
-            const { password, ...info } = user._doc;
-            res.status(200).json({ ...info, accessToken });
+            const data = user._doc
+            res.status(200).json({ ...data, accessToken });
         }
     } catch (err) {
         res.status(500).json(err)
