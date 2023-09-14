@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    plan:{
+        type: String,
+        default: "None"
+    },
     balance: {
         type: String,
         default: "50"
@@ -49,10 +53,6 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    subscriptions: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Subscriptions'
-    }]
-}, { timestamps: true });
+}, { timestamps: true });  
 
 module.exports = mongoose.model("User", userSchema);

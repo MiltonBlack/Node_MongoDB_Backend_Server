@@ -6,7 +6,7 @@ const verify = require("../verifyToken");
 const Deposits = require("../models/deposits");
 const Withdrawals = require("../models/withdrawals");
 
-var single = [];
+// Login User
 router.post("/signin", async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
     try {
@@ -31,7 +31,7 @@ router.post("/signin", async (req, res) => {
     }
 });
 
-// Register
+// Register User
 router.post("/register", async (req, res) => {
     if(req.body.isAdmin){
         
@@ -50,6 +50,22 @@ router.post("/register", async (req, res) => {
     }
 });
 
+
+router.get("/profile", verify, async (req, res) => {
+    const profile = await User.findOne({ email: req.body.email });
+    try {
+            !profile && res.status(401).json("You are Not a User!!!");
+     
+            const bytes = await CryptoJS.AES.decrypt(profile.password, process.env.SECRET_KEY);
+            const realPassword = await bytes.toString(CryptoJS.enc.Utf8);
+
+            realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
+            // const { password, email, isAdmin, fullName } = user._doc;
+            res.status(200).json(profile);
+    } catch (error) {
+        res.status(500).json(err);
+    }
+});
 
 // Get Single user on Page Load
 router.get("/single/:id", verify, async (req, res) => {
@@ -195,5 +211,16 @@ router.get("/withdraw/single/:id", verify, async (req, res) => {
         res.status(403).json(error)
     }
 });
+
+// Fetch all Deposits
+router.get("/all/deposits", async (req, res) => {
+    const allDeposits = await Deposits.find();
+    try {
+        res.status(200).json(allDeposits);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
+
 
 module.exports = router;

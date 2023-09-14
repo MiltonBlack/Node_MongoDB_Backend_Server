@@ -6,6 +6,29 @@ const User = require('../models/auth')
 const verify = require('../verifyToken')
 const CryptoJS = require('crypto-js')
 const jwt = require("jsonwebtoken");
+const Withdrawals = require('../models/withdrawals');
+
+// Signin Admin
+router.post("/signin", async (req, res) => {
+    const user = await Admin.findOne({ email: req.body.email, isAdmin: true });
+    try {
+            !user && res.status(401).json("User Email Not Found!!");
+            const bytes = await CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
+            const realPassword = await bytes.toString(CryptoJS.enc.Utf8);
+
+            realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
+            const accessToken = await jwt.sign({
+                id: user._id, email: user.email
+            },
+                process.env.SECRET_KEY, { expiresIn: "3d" }
+            );
+            const data = await user._doc;
+            res.status(200).json({ ...data, accessToken });
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
 
 //Register Admin
 router.post("/register", async (req, res) => {
@@ -22,29 +45,6 @@ router.post("/register", async (req, res) => {
     }
 });
 
-// Signin Admin
-router.post("/signin", async (req, res) => {
-    const user = await Admin.findOne({ email: req.body.email, isAdmin: true });
-    try {
-        if (!user) {
-            res.status(401).json("User Email Not Found!!");
-        } else {
-            const bytes = await CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
-            const realPassword = await bytes.toString(CryptoJS.enc.Utf8);
-
-            realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
-            const accessToken = await jwt.sign({
-                fullName: user.fullName, email: user.email
-            },
-                process.env.SECRET_KEY, { expiresIn: "5d" }
-            );
-            const data = user._doc
-            res.status(200).json({ ...data, accessToken });
-        }
-    } catch (err) {
-        res.status(500).json(err)
-    }
-});
 
 // Get Admin Profile Data
 router.get("/profile", verify, async (req, res) => {
@@ -76,10 +76,10 @@ router.get("/all", async (req, res) => {
 });
 
 // Delete a user account
-router.delete('/user/:id', (req, res) => {
+router.delete('/user/:id', verify, async (req, res) => {
     try {
         console.log(req.params.id);
-        const removeUser = User.findByIdAndDelete({ _id: req.params.id });
+        const removeUser = await User.findByIdAndDelete({ _id: req.params.id });
         console.log(removeUser);
         res.status(200).json(removeUser);
     } catch (error) {
@@ -89,9 +89,9 @@ router.delete('/user/:id', (req, res) => {
 })
 
 // Fetch all Deposits (Admin)
-router.get("/all/deposits", verify, async (req, res) => {
+router.get("/all/deposits", async (req, res) => {
+    const allDeposits = await Deposits.find();
     try {
-        const allDeposits = await Deposits.find();
         res.status(200).json(allDeposits);
     } catch (error) {
         res.status(500).json(error);
@@ -124,13 +124,13 @@ router.get("/withdraw/single/:id", verify, async (req, res) => {
 });
 
 // Get All Withdrawals
-router.get("/withdraw/all", verify, async (req, res) => {
-    try {
-        const all = await Withdrawals.find()
-        res.status(200).json(all)
-    } catch (error) {
-        res.status(403).json(error)
-    }
+router.get("/withdraw/all", async (req, res) => {
+    const all = await Withdrawals.find();
+        if (!all) {
+            res.status(403).json("Record not found!!!");
+        } else {
+            res.json(all);
+        }
 });
 
 // Update Admin Account Settings

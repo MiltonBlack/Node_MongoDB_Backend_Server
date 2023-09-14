@@ -7,6 +7,6 @@ const withdrawalSchema = new Schema({
     walletAddress:{type:String},
     status: { type: String, default: "pending" },
     pending: { type: Boolean, },
-}, { timestamps: true });
+}, { timestamps: true }); 
 
 module.exports = mongoose.model('Withdrawals', withdrawalSchema);
