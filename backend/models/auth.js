@@ -21,10 +21,6 @@ const userSchema = new mongoose.Schema({
     phoneNumber: {
         type: String,
     },
-    startDate: {
-        type: String,
-        default: ""
-    },
     plan:{
         type: String,
         default: "None"

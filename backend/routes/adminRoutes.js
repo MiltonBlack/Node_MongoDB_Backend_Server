@@ -148,6 +148,21 @@ router.put("/settings/account/:id", verify, async (req, res) => {
     }
 });
 
+// Approve Deposits and Plan Subscriptions
+router.put("/approve/:id", verify, async (req, res) => {
+    if (req.user.id === req.params.id) {
+        try {
+            const approveDnS = await User.findByIdAndUpdate(req.params.id, { $set: req.body, }
+                , { new: true });
+            res.status(200).json(approveDnS);
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    } else {
+        res.status(403).json("Only Admins can Approve Deposits and Plan Subscriptions")
+    }
+});
+
 // Update Admin Security Settings
 router.put("/settings/security/:id", verify, async (req, res) => {
     if (req.user.id === req.params.id) {
