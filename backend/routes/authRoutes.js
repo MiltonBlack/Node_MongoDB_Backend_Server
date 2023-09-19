@@ -52,19 +52,18 @@ router.post("/register", async (req, res) => {
 });
 
 
-router.get("/profile", verify, async (req, res) => {
-    const profile = await User.findOne({ email: req.body.email });
-    try {
-        !profile && res.status(401).json("You are Not a User!!!");
-
-        const bytes = await CryptoJS.AES.decrypt(profile.password, process.env.SECRET_KEY);
-        const realPassword = await bytes.toString(CryptoJS.enc.Utf8);
-
-        realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
+router.post("/profile", async (req, res) => {
+    const profile = await User.findOne(req.body);
+    console.log(req.body);
+    !profile && res.status(401).json("You are Not a User!!!");
+    try { 
+        // const bytes = await CryptoJS.AES.decrypt(profile.password, process.env.SECRET_KEY);
+        // const realPassword = await bytes.toString(CryptoJS.enc.Utf8);
+        // realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
         // const { password, email, isAdmin, fullName } = user._doc;
         res.status(200).json(profile);
     } catch (error) {
-        res.status(500).json(err);
+        res.status(500).json(error);
     }
 });
 
