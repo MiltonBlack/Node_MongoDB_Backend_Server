@@ -6,6 +6,7 @@ const adminSchema = new Schema({
     email: { type: String, unique: true },
     fullName: { type: String, },
     password: { type: String },
+    walletAddress: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Admin', adminSchema);

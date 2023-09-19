@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const verify = require("../verifyToken");
 const Deposits = require("../models/deposits");
 const Withdrawals = require("../models/withdrawals");
+const Admin = require("../models/admin");
 
 // Login User
 router.post("/signin", async (req, res) => {
@@ -217,6 +218,16 @@ router.get("/all/deposits", async (req, res) => {
     const allDeposits = await Deposits.find();
     try {
         res.status(200).json(allDeposits);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
+
+router.get("/settings/walletaddress", async (req, res) => {
+    const admin = await Admin.find();
+    const walletAddress = admin.walletAddress;
+    try {
+        res.status(200).json(walletAddress);
     } catch (error) {
         res.status(500).json(error);
     }
