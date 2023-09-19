@@ -6,7 +6,7 @@ const depositSchema = new Schema({
     amount: { type: String, },
     status: { type: String, default: "pending" },
     proofUrl: { type: String, },
-    pending: { type: Boolean, },
+    pending: { type: Boolean, default:true },
     type:{type: String},
 }, { timestamps: true });
 

@@ -34,8 +34,8 @@ router.post("/signin", async (req, res) => {
 
 // Register User
 router.post("/register", async (req, res) => {
-    if(req.body.isAdmin){
-        
+    if (req.body.isAdmin) {
+
     }
     const newUser = await new User({
         firstName: req.body.firstName,
@@ -55,14 +55,14 @@ router.post("/register", async (req, res) => {
 router.get("/profile", verify, async (req, res) => {
     const profile = await User.findOne({ email: req.body.email });
     try {
-            !profile && res.status(401).json("You are Not a User!!!");
-     
-            const bytes = await CryptoJS.AES.decrypt(profile.password, process.env.SECRET_KEY);
-            const realPassword = await bytes.toString(CryptoJS.enc.Utf8);
+        !profile && res.status(401).json("You are Not a User!!!");
 
-            realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
-            // const { password, email, isAdmin, fullName } = user._doc;
-            res.status(200).json(profile);
+        const bytes = await CryptoJS.AES.decrypt(profile.password, process.env.SECRET_KEY);
+        const realPassword = await bytes.toString(CryptoJS.enc.Utf8);
+
+        realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
+        // const { password, email, isAdmin, fullName } = user._doc;
+        res.status(200).json(profile);
     } catch (error) {
         res.status(500).json(err);
     }
@@ -180,8 +180,8 @@ router.post("/deposit", verify, async (req, res) => {
 router.get("/deposit/single/:id", verify, async (req, res) => {
     try {
         if (req.params.id) {
-            console.log(req.params.id);
-            const singleDeposit = await Deposits.find({ user_id : req.params.id });
+            // console.log(req.params.id);
+            const singleDeposit = await Deposits.find({ user_id: req.params.id });
             res.status(200).json(singleDeposit);
         } else {
             res.status(403).json("Bad Request!!");
@@ -224,7 +224,8 @@ router.get("/all/deposits", async (req, res) => {
 });
 
 router.get("/settings/walletaddress", async (req, res) => {
-    const admin = await Admin.find();
+    const admin = await Admin.findOne();
+    // console.log(admin.walletAddress);
     const walletAddress = admin.walletAddress;
     try {
         res.status(200).json(walletAddress);
@@ -232,6 +233,5 @@ router.get("/settings/walletaddress", async (req, res) => {
         res.status(500).json(error);
     }
 });
-
 
 module.exports = router;

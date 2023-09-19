@@ -12,18 +12,18 @@ const Withdrawals = require('../models/withdrawals');
 router.post("/signin", async (req, res) => {
     const user = await Admin.findOne({ email: req.body.email, isAdmin: true });
     try {
-            !user && res.status(401).json("User Email Not Found!!");
-            const bytes = await CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
-            const realPassword = await bytes.toString(CryptoJS.enc.Utf8);
+        !user && res.status(401).json("User Email Not Found!!");
+        const bytes = await CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
+        const realPassword = await bytes.toString(CryptoJS.enc.Utf8);
 
-            realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
-            const accessToken = await jwt.sign({
-                id: user._id, email: user.email
-            },
-                process.env.SECRET_KEY, { expiresIn: "3d" }
-            );
-            const data = await user._doc;
-            res.status(200).json({ ...data, accessToken });
+        realPassword !== req.body.password && res.status(401).json("Wrong Password or Username!!!");
+        const accessToken = await jwt.sign({
+            id: user._id, email: user.email
+        },
+            process.env.SECRET_KEY, { expiresIn: "3d" }
+        );
+        const data = await user._doc;
+        res.status(200).json({ ...data, accessToken });
     } catch (err) {
         res.status(500).send(err);
     }
@@ -126,11 +126,11 @@ router.get("/withdraw/single/:id", verify, async (req, res) => {
 // Get All Withdrawals
 router.get("/withdraw/all", async (req, res) => {
     const all = await Withdrawals.find();
-        if (!all) {
-            res.status(403).json("Record not found!!!");
-        } else {
-            res.json(all);
-        }
+    if (!all) {
+        res.status(403).json("Record not found!!!");
+    } else {
+        res.json(all);
+    }
 });
 
 // Update Admin Account Settings
@@ -148,11 +148,25 @@ router.put("/settings/account/:id", verify, async (req, res) => {
     }
 });
 
-// Approve Deposits and Plan Subscriptions
+// Approve Plan Subscriptions
+router.put("/approve/plan/:id", verify, async (req, res) => {
+    if (req.user.id === req.params.id) {
+        try {
+            const approveDnS = await User.findByIdAndUpdate(req.params.id, { $set: { planStatus: true }, }
+                , { new: true });
+            res.status(200).json(approveDnS);
+        } catch (err) {
+            res.status(500).json(err);
+        }
+    } else {
+        res.status(403).json("Only Admins can Approve Deposits and Plan Subscriptions")
+    }
+});
+// Approve Deposits and Subscriptions
 router.put("/approve/:id", verify, async (req, res) => {
     if (req.user.id === req.params.id) {
         try {
-            const approveDnS = await User.findByIdAndUpdate(req.params.id, { $set: req.body, }
+            const approveDnS = await Deposits.findByIdAndUpdate({ user_id: req.params.id }, { $set: { pending: false, status: "approved" }, }
                 , { new: true });
             res.status(200).json(approveDnS);
         } catch (err) {

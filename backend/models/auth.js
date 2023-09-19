@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
     },
     walletAddress: {
         type: String,
-        default: "fw47g82rgb482hrbrfui4834h984r398hfnfwo"
+        default: ""
     },
     investment: {
         type: String,
@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
     isAdmin: {
         type: Boolean,
         default: false
+    },
+    planStatus:{
+        type: Boolean,
+        default:false
     },
     emailVerified: {
         type: Boolean,
