@@ -3,7 +3,7 @@ const MONGO_URI_CONN = 'mongodb+srv://Blackdice:Black177@cluster0.1gxkqc6.mongod
 const connectDB = async () => {
     try {
       // const conn = await mongoose.connect(MONGO_URI_CONN);
-       await mongoose.connect(process.env.MONGO_URI);
+       await mongoose.connect(MONGO_URI_CONN);
     } catch (error) {
       console.log(error)
       process.exit(1)
