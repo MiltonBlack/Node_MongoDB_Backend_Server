@@ -11,6 +11,9 @@ const Withdrawals = require('../models/withdrawals');
 // Signin Admin
 router.post("/signin", async (req, res) => {
     const user = await Admin.findOne({ email: req.body.email, isAdmin: true });
+    const totalDeposit = await Deposits.find();
+    const withdrawals = await Withdrawals.find();
+    const usersLength = (await User.find()).length;
     try {
         !user && res.status(401).json("User Email Not Found!!");
         const bytes = await CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
@@ -22,8 +25,9 @@ router.post("/signin", async (req, res) => {
         },
             process.env.SECRET_KEY, { expiresIn: "3d" }
         );
+        
         const data = await user._doc;
-        res.status(200).json({ ...data, accessToken });
+        res.status(200).json({ ...data, accessToken, totalDeposit, withdrawals, usersLength });
     } catch (err) {
         res.status(500).send(err);
     }
@@ -73,10 +77,10 @@ router.get("/all", async (req, res) => {
     } catch (error) {
         res.status(500).json(error);
     }
-});
+});          
 
 // Delete a user account
-router.delete('/user/:id', verify, async (req, res) => {
+router.delete('/user/:id', async (req, res) => {
     try {
         console.log(req.params.id);
         const removeUser = await User.findByIdAndDelete({ _id: req.params.id });
@@ -112,6 +116,8 @@ router.get("/single/:id", verify, async (req, res) => {
         res.status(500).json(error);
     }
 });
+
+// Fetch Single Deposit by User_id
 
 // Fetch Withdrawals by user_id
 router.get("/withdraw/single/:id", verify, async (req, res) => {
@@ -149,32 +155,35 @@ router.put("/settings/account/:id", verify, async (req, res) => {
 });
 
 // Approve Plan Subscriptions
-router.put("/approve/plan/:id", verify, async (req, res) => {
-    if (req.user.id === req.params.id) {
+router.put("/approve/plan/:id", verify,  async (req, res) => {
         try {
-            const approveDnS = await User.findByIdAndUpdate(req.params.id, { $set: { planStatus: true }, }
+            console.log(req.body);
+            const approveDnS = await User.findByIdAndUpdate(req.params.id, { $set: req.body, }
                 , { new: true });
+                console.log(approveDnS);
             res.status(200).json(approveDnS);
         } catch (err) {
             res.status(500).json(err);
         }
-    } else {
-        res.status(403).json("Only Admins can Approve Deposits and Plan Subscriptions")
-    }
+    // } else {
+    //     res.status(403).json("Only Admins can Approve Deposits and Plan Subscriptions")
+    // }
 });
 // Approve Deposits and Subscriptions
 router.put("/approve/:id", verify, async (req, res) => {
-    if (req.user.id === req.params.id) {
+    // if (req.user.id === req.params.id) {
+        console.log(req.body);
         try {
-            const approveDnS = await Deposits.findByIdAndUpdate({ user_id: req.params.id }, { $set: { pending: false, status: "approved" }, }
+            const approveDnS = await Deposits.findByIdAndUpdate( req.params.id, { $set: req.body, }
                 , { new: true });
+                console.log(approveDnS);
             res.status(200).json(approveDnS);
         } catch (err) {
             res.status(500).json(err);
         }
-    } else {
-        res.status(403).json("Only Admins can Approve Deposits and Plan Subscriptions")
-    }
+    // } else {
+    //     res.status(403).json("Only Admins can Approve Deposits and Plan Subscriptions")
+    // }
 });
 
 // Update Admin Security Settings

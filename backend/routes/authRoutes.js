@@ -6,6 +6,7 @@ const verify = require("../verifyToken");
 const Deposits = require("../models/deposits");
 const Withdrawals = require("../models/withdrawals");
 const Admin = require("../models/admin");
+const transporter = require("../services/nodemailer");
 
 // Login User
 router.post("/signin", async (req, res) => {
@@ -34,8 +35,12 @@ router.post("/signin", async (req, res) => {
 
 // Register User
 router.post("/register", async (req, res) => {
-    if (req.body.isAdmin) {
-
+    const mailData = {
+        from: 'eghoiazibapu@gmail.com',
+        to: req.body.email,
+        subject: 'Verify Your Email',
+        text: 'Click on the Link to Verify Your Email',
+        html: '<div style={{display:flex, flex-direction:column, padding:20px}}><h1>Verify your Email<h1/><button style={{padding:5px, background-color:blue, color:white}}>Verify<button/><div/>'
     }
     const newUser = await new User({
         firstName: req.body.firstName,
@@ -45,6 +50,12 @@ router.post("/register", async (req, res) => {
     });
     try {
         const user = await newUser.save();
+        // send verify mail function
+        transporter.sendMail(mailData, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+        });
         res.status(201).json(user);
     } catch (err) {
         res.status(500).json(err);
