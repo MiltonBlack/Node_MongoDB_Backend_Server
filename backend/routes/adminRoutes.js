@@ -155,12 +155,11 @@ router.put("/settings/account/:id", verify, async (req, res) => {
 });
 
 // Approve Plan Subscriptions
-router.put("/approve/plan/:id", verify,  async (req, res) => {
+router.put("/approve/plan/:id",   async (req, res) => {
         try {
-            console.log(req.body);
-            const approveDnS = await User.findByIdAndUpdate(req.params.id, { $set: req.body, }
-                , { new: true });
-                console.log(approveDnS);
+            // console.log(req.body);
+            const approveDnS = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+                // console.log(approveDnS);
             res.status(200).json(approveDnS);
         } catch (err) {
             res.status(500).json(err);
@@ -170,13 +169,12 @@ router.put("/approve/plan/:id", verify,  async (req, res) => {
     // }
 });
 // Approve Deposits and Subscriptions
-router.put("/approve/:id", verify, async (req, res) => {
+router.put("/approve/:id",  async (req, res) => {
     // if (req.user.id === req.params.id) {
-        console.log(req.body);
+        // console.log(req.body);
         try {
-            const approveDnS = await Deposits.findByIdAndUpdate( req.params.id, { $set: req.body, }
-                , { new: true });
-                console.log(approveDnS);
+            const approveDnS = await Deposits.findByIdAndUpdate( req.params.id, req.body , { new: true });
+                // console.log(approveDnS);
             res.status(200).json(approveDnS);
         } catch (err) {
             res.status(500).json(err);
