@@ -91,15 +91,7 @@ router.get("/single/:id", verify, async (req, res) => {
     } catch (error) {
         res.status(500).json(error);
     }
-})
-
-router.put('deposit/:id', (req, res) => {
-    res.status(200).json({ message: `Update Data ${req.params.id}` })
-})
-router.put('all/:id', (req, res) => {
-    res.status(200).json({ message: `Update Data ${req.params.id}` })
-})
-
+});
 
 // Update User Plan
 router.put("/plan/:id", verify, async (req, res) => {
@@ -233,6 +225,7 @@ router.get("/all/deposits", async (req, res) => {
     }
 });
 
+// Get wallet address
 router.get("/settings/walletaddress", async (req, res) => {
     const admin = await Admin.findOne();
     // console.log(admin.walletAddress);
